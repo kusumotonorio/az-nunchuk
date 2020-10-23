@@ -1,3 +1,5 @@
+#include <Float64.h>
+
 /*
 This file is a part of AZ-Nunchuk project.
 https://az-nunchuk.fun/
@@ -48,7 +50,7 @@ bool SendReceiveMsg(char* msgToSend, char* res, int axisId) {
       idx=0;
     }
     if (r != '\r') {
-  //    debug(" ");
+  //    debug((char*)" ");
   //    debug(r);
       res[idx] = r;
       idx++;
@@ -60,7 +62,7 @@ bool SendReceiveMsg(char* msgToSend, char* res, int axisId) {
   }
   res[idx++] = '\0';
   if(retry==100){
-    debug("TIMEOUT");
+    debug((char*)"TIMEOUT");
   }
   //sSerial.println("");
   //sSerial.print("-->");
@@ -74,7 +76,7 @@ static int threadX(struct pt *pt1) {
     PT_BEGIN(pt1);
     while(true) {
       PT_WAIT_UNTIL(pt1, msgX==true);
-      //debug("Thread X ..");
+      //debug((char*)"Thread X ..");
       //sSerial.println(axisX->requestSpeed);
       //debugln();
       msgX=false;
@@ -119,7 +121,7 @@ static int threadX(struct pt *pt1) {
               retry++;
             }
             if(retry>=13){
-              debug("Can't confirm Stop");
+              debug((char*)"Can't confirm Stop");
               continue;
             }
             if(axisX->actualSpeed != 0){
@@ -165,7 +167,7 @@ static int threadY(struct pt *pt2) {
     PT_BEGIN(pt2);
     while(true) {
       PT_WAIT_UNTIL(pt2, msgY==true);
-      debug("Thread Y ..");
+      debug((char*)"Thread Y ..");
       //sSerial.println(axisY->requestSpeed);
       debugln();
       msgY=false;
@@ -207,7 +209,7 @@ static int threadY(struct pt *pt2) {
               retry++;
             }
             if(retry>=13){
-              debug("Can't confirm Stop");
+              debug((char*)"Can't confirm Stop");
               continue;
             }
             if(axisY->actualSpeed != 0){
@@ -271,9 +273,9 @@ static int threadNunchuk(struct pt *pt) {
             currentSpeedStep--;
             //changedX=true;
             //changedY=true;
-            debug("Speed Down :");
+            debug((char*)"Speed Down :");
             debug(currentSpeedStep);
-            debug("\n\r");
+            debug((char*)"\n\r");
             beep(currentSpeedStep);
             currentStepZ = newStepZ;
             currentStepC = newStepC;        
@@ -284,9 +286,9 @@ static int threadNunchuk(struct pt *pt) {
             currentSpeedStep++;
             //changedX=true;
             //changedY=true;
-            debug("Speed Up   :");
+            debug((char*)"Speed Up   :");
             debug(currentSpeedStep);
-            debug("\n\r"); 
+            debug((char*)"\n\r"); 
             beep(currentSpeedStep);
             currentStepZ = newStepZ;
             currentStepC = newStepC;
@@ -295,21 +297,21 @@ static int threadNunchuk(struct pt *pt) {
       }
       if(currentStepX!=newStepX){
             changedX=true;
-              debug("Joy Stick  :");
+              debug((char*)"Joy Stick  :");
               debug(newStepX);
-              debug("  ");
+              debug((char*)"  ");
               debug(newStepY);
-              debug("  ");
-              debug("\n\r");
+              debug((char*)"  ");
+              debug((char*)"\n\r");
       }
       if(currentStepY!=newStepY){
             changedY=true;
-              debug("Joy Stick  :");
+              debug((char*)"Joy Stick  :");
               debug(newStepX);
-              debug("  ");
+              debug((char*)"  ");
               debug(newStepY);
-              debug("  ");
-              debug("\n\r");    
+              debug((char*)"  ");
+              debug((char*)"\n\r");    
       }
       if(changedX==true && changedY==false){
         msgX=true;
@@ -358,14 +360,14 @@ void setup() {
   serialInUse=false;
 
   //Init Numchuk I2C
-  //debug("Initializing nunchuk interface:\n");  
+  //debug((char*)"Initializing nunchuk interface:\n");  
   nunchuk = new ArduinoNunchuk();
   nunchuk->init();
 
   //Operation Mode change
   YInvMode=(EEPROM.read(0x000)==1?true:false);
   SHemis=(EEPROM.read(0x001)==1?true:false);
-  debug("Reading YInvMode from EEPROM:");
+  debug((char*)"Reading YInvMode from EEPROM:");
   debug(YInvMode);
   debugln();
   int change=0;
@@ -376,7 +378,7 @@ void setup() {
   if(nunchuk->stepZ){
     YInvMode=(!YInvMode);
     EEPROM.update(0x000, YInvMode?1:0);//
-    debug("YInvMode Updated:");
+    debug((char*)"YInvMode Updated:");
     debug(YInvMode);
     debugln();
     if(!YInvMode){
@@ -394,7 +396,7 @@ void setup() {
   if(nunchuk->stepC){
     SHemis=(!SHemis);
     EEPROM.update(0x001, SHemis?1:0);//
-    debug("SHemis Updated:");
+    debug((char*)"SHemis Updated:");
     debug(SHemis);
     debugln();
     if(!SHemis){
@@ -412,7 +414,7 @@ void setup() {
   }
   //Tracking Mode selection if EQ mode enabled
   delay(500);
-  debug("Access to Mount..:");
+  debug((char*)"Access to Mount..:");
   debugln();
   float baseSecPR=sediPeriod;
   int eqMode=0;
@@ -429,7 +431,7 @@ void setup() {
 
     if(retry>10){
       //Error Beep
-      debug("Error: Mount disconnected.. \n");
+      debug((char*)"Error: Mount disconnected.. \n");
       while(1){
         //Error
         tone(TONE_PIN,880,500) ;
@@ -443,11 +445,11 @@ void setup() {
   while(retry <60){
     if(SendReceiveMsg(":q3010000\0", response,1)){
       if((response[2] & 0x08)!=0x00){
-        debug("Tracking mode selection....");
+        debug((char*)"Tracking mode selection....");
         debugln();
         //User's selection
         //ここで赤道儀か経緯台を選ばせる
-        debug("Enter EQ Mode Selection");
+        debug((char*)"Enter EQ Mode Selection");
         int loopc=0;
         while(true){
           if(loopc==0){
@@ -460,7 +462,7 @@ void setup() {
           
           if(nunchuk->analogX<50){
             baseSecPR=sediPeriod;
-            debug("AZ Mode Selected \n");
+            debug((char*)"AZ Mode Selected \n");
             soundAZALT();
             SHemis=false;
             break;
@@ -468,26 +470,26 @@ void setup() {
             if(nunchuk->stepC==0){
               baseSecPR=sediPeriod;
               eqMode=1;
-              debug("EQ Mode Selected \n");
+              debug((char*)"EQ Mode Selected \n");
               soundStar();
               break;
             }else{
             baseSecPR=sediPeriod/2;
               eqMode=1;
-              debug("0.5 EQ Mode Selected \n");
+              debug((char*)"0.5 EQ Mode Selected \n");
               soundStar05();
               break;              
             }
           }else if(nunchuk->analogY<50){
             baseSecPR=moonPeriod;
             eqMode=2;
-            debug("Luner Mode Selected \n");  
+            debug((char*)"Luner Mode Selected \n");  
             soundMoon();          
             break;
           }else if(nunchuk->analogY>206){
             baseSecPR=sunPeriod;
             eqMode=3;
-            debug("Solar Mode Selected \n");
+            debug((char*)"Solar Mode Selected \n");
             soundSun();
             break;
           }
@@ -496,7 +498,7 @@ void setup() {
         }
         break;
       }else{
-        debug("AZ Mode Only... \n");
+        debug((char*)"AZ Mode Only... \n");
       }
       break;
     }else{
@@ -513,7 +515,7 @@ void setup() {
     }
   }
 
-  debug("Initializeing Component.. \n");
+  debug((char*)"Initializeing Component.. \n");
 
   //Anti chattering inputs
   axisX=new Axis(1, eqMode, baseSecPR, SHemis);
@@ -527,7 +529,7 @@ void setup() {
   //Stop once
   axisX->SetSpeed(0.0);
   axisY->SetSpeed(0.0);
-  debug("Initialized");  
+  debug((char*)"Initialized");  
 
   // ptを初期化
   serialSem=1;
